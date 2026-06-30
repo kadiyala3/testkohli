@@ -26,22 +26,18 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Image') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-
-                    sh '''
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker push $DOCKER_IMAGE:$IMAGE_TAG
-                    docker logout
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push "$DOCKER_USER/demo:v1"
+                docker logout
                     '''
+                    }
                 }
             }
-        }
+
 
         stage('Deploy to Kubernetes') {
             steps {
